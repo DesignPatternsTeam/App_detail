@@ -12,6 +12,7 @@ import tree.database.MySQLCor;
 
 public class test1 {
 // hello world !!!
+	//hello nihao
 /*	
     StringBuffer write = new StringBuffer("D:\\APK\\exception.txt");
 	try {
