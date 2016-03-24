@@ -14,6 +14,7 @@ public class test1 {
 // hello world !!!
 	//hello nihao
 	//ihihkljhklhlkjh
+	////nnnnnnnnnnnnn
 /*	
     StringBuffer write = new StringBuffer("D:\\APK\\exception.txt");
 	try {
