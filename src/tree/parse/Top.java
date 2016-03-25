@@ -21,7 +21,8 @@ public class Top {
 			StringBuffer write = new StringBuffer("E:\\apk\\apk_detail_string\\luanma.txt");
 			writer= new BufferedWriter(new FileWriter(new File(write.toString()),true));
 			
-			StringBuffer path = new StringBuffer("E:\\apk\\apk6000");                  //------------daiding   			
+//			StringBuffer path = new StringBuffer("E:\\apk\\apk6000");                  //------------daiding   			
+			StringBuffer path = new StringBuffer("F:\\李颖师姐代码(new )\\apk6000");  
 			File file = new File(path.toString());
 			File files[] = file.listFiles();
 			
@@ -69,7 +70,10 @@ public class Top {
 			for(int i = arraycount; i < files.length; i++){
 				OneParser parser = new OneParser(files[i], mysql,j);
 				try {
-					int mark = parser.parse();
+					//TODO
+					//int mark = parser.parse();
+					int mark = parser.parseSimpleSeperate();
+					
 					if (mark == 0) {
 						System.out.println("此处已删除" + k + "个乱码项目------------");
 						k++;			
