@@ -21,6 +21,11 @@ import com.mysql.jdbc.log.Log;
 import com.mysql.jdbc.log.LogUtils;
 
 import tree.database.MySQLCor;
+import tree.factory.InvokeClassNameParserFactory;
+import tree.factory.InvokeMethodNameParser;
+import tree.factory.InvokeMethodNameParserFactory;
+import tree.factory.Parser;
+import tree.factory.Provider;
 import tree.parse.entity.ApkEntity;
 import tree.parse.entity.CallBase;
 import tree.parse.entity.Callee;
@@ -35,6 +40,18 @@ public class OneParser {
 
 	String[] javapack;
 	String[] androidpack;
+	
+	/*
+	 * Factories realization
+	 * Edit by liuyunhao
+	 * 2016/3/27
+	 */
+	/*Firstly we create the factory of the parser*/
+	Provider invokeMethodNameParserFactory = new InvokeMethodNameParserFactory(); 
+	Provider invokeClassNameParserFactory = new InvokeClassNameParserFactory();
+	/*Secondly we create the parser by using factory*/
+	Parser invokeMethodNameParser = invokeMethodNameParserFactory.produce();
+	Parser invokeClassNameParser = invokeClassNameParserFactory.produce();
 
 	public OneParser() {
 	}
@@ -187,8 +204,8 @@ public class OneParser {
 							StringBuffer invokemethodsig = new StringBuffer();
 
 							if (line.toString().startsWith("invoke")) {
-								StringBuffer invokeclassname = parseInvokeClassName(line);
-								StringBuffer invokemethodname = parseInvokeMethodName(line);
+								StringBuffer invokeclassname = invokeClassNameParser.parse(line);
+								StringBuffer invokemethodname = invokeMethodNameParser.parse(line);
 
 								line = null;
 
@@ -483,8 +500,8 @@ public class OneParser {
 							StringBuffer invokemethodsig = new StringBuffer();
 
 							if (line.toString().startsWith("invoke")) {
-								StringBuffer invokeclassname = parseInvokeClassName(line);
-								StringBuffer invokemethodname = parseInvokeMethodName(line);
+								StringBuffer invokeclassname = invokeClassNameParser.parse(line);
+								StringBuffer invokemethodname = invokeMethodNameParser.parse(line);
 
 								line = null;
 
@@ -1069,37 +1086,7 @@ public class OneParser {
 		return inclasssig;
 	}
 
-	private StringBuffer parseInvokeMethodName(StringBuffer line) {
-		try {
-			int index = line.indexOf("->");
-
-			line = new StringBuffer(line.substring(index + 2));
-			line.trimToSize();
-
-			if (line.toString().endsWith(";")) {
-				line = new StringBuffer(line
-						.substring(0, ((line.length()) - 1)));
-			}
-
-		} catch (Exception e) {
-		}
-		return line;
-	}
-
-	private StringBuffer parseInvokeClassName(StringBuffer line) {
-		try {
-			int index1 = line.indexOf("},");
-			int index2 = line.indexOf("->");
-
-			line = new StringBuffer(line.substring((index1 + 3), (index2 - 1)));
-			line.trimToSize();
-
-		} catch (Exception e) {
-		}
-
-		return line;
-	}
-
+	
 	private Object parseArgs(StringBuffer args) {
 		int index = 0;
 		StringBuffer stanargs = new StringBuffer();
