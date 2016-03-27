@@ -25,6 +25,7 @@ import tree.parse.entity.ApkEntity;
 import tree.parse.entity.CallBase;
 import tree.parse.entity.Callee;
 import tree.parse.entity.Caller;
+import tree.utils.ParserUtils;
 
 public class OneParser {
 	private File file;
@@ -1108,7 +1109,7 @@ public class OneParser {
 					.charAt(i)));
 			String letstr = letter.toString();
 
-			if (isBaseLetter(letstr)) {
+			if (ParserUtils.isBaseLetter(letstr)) {
 				StringBuffer basestr = new StringBuffer(parseBaseType(letstr));
 
 				if (i == (args.length() - 1))
@@ -1118,7 +1119,7 @@ public class OneParser {
 				}
 			}
 
-			else if (isObjectLetter(letstr)) {
+			else if (ParserUtils.isObjectLetter(letstr)) {
 				index = args.indexOf(";", i);
 				letter = new StringBuffer(args.substring(i, index));
 				letter = stanClassSig(letter);
@@ -1130,14 +1131,14 @@ public class OneParser {
 					stanargs = stanargs.append(letter).append(",");
 				}
 			}
-
-			else if (isArrayLetter(letstr)) {
+			
+			else if (ParserUtils.isArrayLetter(letstr)) {
 				int count = 1;
 				i++;
 				letter = new StringBuffer(String.valueOf(args.charAt(i)));
 				letstr = letter.toString();
 
-				while (isArrayLetter(letstr)) {
+				while (ParserUtils.isArrayLetter(letstr)) {
 					count++;
 					i++;
 					letter = new StringBuffer(String.valueOf(args.charAt(i)));
@@ -1145,7 +1146,7 @@ public class OneParser {
 
 				}
 
-				if (isBaseLetter(letstr)) {
+				if (ParserUtils.isBaseLetter(letstr)) {
 					letter = new StringBuffer(parseBaseType(letstr));
 					for (int j = 0; j < count; j++) {
 						letter = letter.append("[]");
@@ -1158,7 +1159,7 @@ public class OneParser {
 					}
 				}
 
-				else if (isObjectLetter(letstr)) {
+				else if (ParserUtils.isObjectLetter(letstr)) {
 					index = args.indexOf(";", i);
 					letter = new StringBuffer(args.substring(i, index));
 					letter = stanClassSig(letter);
@@ -1180,44 +1181,6 @@ public class OneParser {
 		return stanargs;
 	}
 
-	private boolean isArrayLetter(String letter) {
-		if ("[".equals(letter))
-			return true;
-		return false;
-	}
-
-	private boolean isObjectLetter(String letter) {
-		if ("L".equals(letter))
-			return true;
-		return false;
-	}
-
-	private boolean isBaseLetter(String letter) {
-		if (("Z".equals(letter)) || ("B".equals(letter))
-				|| ("S".equals(letter)) || ("C".equals(letter))
-				|| ("I".equals(letter)) || ("J".equals(letter))
-				|| ("F".equals(letter)) || ("D".equals(letter)))
-			return true;
-		return false;
-	}
-
-	private boolean isArray(String returntype) {
-		if (returntype.startsWith("["))
-			return true;
-		return false;
-	}
-
-	private boolean isObject(String returntype) {
-		if (returntype.startsWith("L"))
-			return true;
-		return false;
-	}
-
-	private boolean isBaseType(StringBuffer returntype) {
-		if (returntype.length() == 1)
-			return true;
-		return false;
-	}
 
 	private String parseBaseType(String returntype) {
 		if ("V".equals(returntype))
@@ -1244,24 +1207,24 @@ public class OneParser {
 
 	private StringBuffer parseRType(StringBuffer returntype) {
 		int count = 0;
-		if (isBaseType(returntype)) {
+		if (ParserUtils.isBaseType(returntype)) {
 			returntype = new StringBuffer(parseBaseType(returntype.toString()));
 			return returntype;
 
 		}
 
-		else if (isObject(returntype.toString())) {
+		else if (ParserUtils.isObject(returntype.toString())) {
 			returntype = stanClassSig(returntype);
 			return returntype;
 
 		}
 
-		else if (isArray(returntype.toString())) {
+		else if (ParserUtils.isArray(returntype.toString())) {
 			count = (returntype.lastIndexOf("[")) + 1;
 			returntype = new StringBuffer(returntype.substring(count));
 			returntype.trimToSize();
 
-			if (isBaseType(returntype)) {
+			if (ParserUtils.isBaseType(returntype)) {
 				returntype = new StringBuffer(parseBaseType(returntype
 						.toString()));
 				for (int i = 0; i < count; i++) {
@@ -1270,7 +1233,7 @@ public class OneParser {
 				return returntype;
 			}
 
-			if (isObject(returntype.toString())) {
+			if (ParserUtils.isObject(returntype.toString())) {
 				returntype = stanClassSig(returntype);
 				for (int i = 0; i < count; i++) {
 					returntype = returntype.append("[]");
