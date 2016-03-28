@@ -1,4 +1,4 @@
-package tree.parserFactory;
+package tree.parse.parserFactory;
 
 public class ClassNameParserFactory implements Provider {
 

@@ -1,4 +1,4 @@
-package tree.stanFactory;
+package tree.parse.stanFactory;
 
 public class AppVersionAndNameStaner implements Staner {
 

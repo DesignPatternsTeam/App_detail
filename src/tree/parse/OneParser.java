@@ -25,15 +25,15 @@ import tree.parse.entity.ApkEntity;
 import tree.parse.entity.CallBase;
 import tree.parse.entity.Callee;
 import tree.parse.entity.Caller;
-import tree.parserFactory.ClassNameParserFactory;
-import tree.parserFactory.InvokeClassNameParserFactory;
-import tree.parserFactory.InvokeMethodNameParser;
-import tree.parserFactory.InvokeMethodNameParserFactory;
-import tree.parserFactory.MethodNameParserFactory;
-import tree.parserFactory.Parser;
-import tree.parserFactory.Provider;
-import tree.stanFactory.StanFactory;
-import tree.stanFactory.Staner;
+import tree.parse.parserFactory.ClassNameParserFactory;
+import tree.parse.parserFactory.InvokeClassNameParserFactory;
+import tree.parse.parserFactory.InvokeMethodNameParser;
+import tree.parse.parserFactory.InvokeMethodNameParserFactory;
+import tree.parse.parserFactory.MethodNameParserFactory;
+import tree.parse.parserFactory.Parser;
+import tree.parse.parserFactory.Provider;
+import tree.parse.stanFactory.StanFactory;
+import tree.parse.stanFactory.Staner;
 import tree.utils.ParserUtils;
 
 public class OneParser {
