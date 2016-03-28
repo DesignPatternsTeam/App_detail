@@ -11,6 +11,9 @@ import java.sql.SQLException;
 
 import parse.mapping.permission.*;
 import tree.database.MySQLCor;
+import tree.database.dbopt.ConnectToAppDetail;
+import tree.database.dbopt.ConnectToPermissionMapping;
+import tree.database.dbopt.Context;
 
 public class Top {
 
@@ -26,8 +29,12 @@ public class Top {
 			File file = new File(path.toString());
 			File files[] = file.listFiles();
 			
-			String dburl = "jdbc:mysql://localhost:3306/app_detail";
-			MySQLCor mysql = new MySQLCor(dburl);
+//			String dburl = "jdbc:mysql://localhost:3306/app_detail";
+//			MySQLCor mysql = new MySQLCor(dburl);
+			
+			Context context = new Context();
+			context.setConnector(new ConnectToAppDetail());
+			MySQLCor mysql = context.getMySQLCor();
 
 			
 			//中断处理
@@ -85,8 +92,11 @@ public class Top {
 						continue;
 					}
 					
-					String dburlper = "jdbc:mysql://localhost:3306/permission-mapping";
-					MySQLCor mysqlper = new MySQLCor(dburlper);	
+//					String dburlper = "jdbc:mysql://localhost:3306/permission-mapping";
+//					MySQLCor mysqlper = new MySQLCor(dburlper);
+					
+					context.setConnector(new ConnectToPermissionMapping());
+					MySQLCor mysqlper = context.getMySQLCor();
 					
 					//解析 permission
 					parsePermissionOne permission = new parsePermissionOne(j, mysql, mysqlper);
