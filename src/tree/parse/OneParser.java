@@ -21,22 +21,26 @@ import com.mysql.jdbc.log.Log;
 import com.mysql.jdbc.log.LogUtils;
 
 import tree.database.MySQLCor;
-import tree.factory.InvokeClassNameParserFactory;
-import tree.factory.InvokeMethodNameParser;
-import tree.factory.InvokeMethodNameParserFactory;
-import tree.factory.Parser;
-import tree.factory.Provider;
 import tree.parse.entity.ApkEntity;
 import tree.parse.entity.CallBase;
 import tree.parse.entity.Callee;
 import tree.parse.entity.Caller;
+import tree.parserFactory.ClassNameParserFactory;
+import tree.parserFactory.InvokeClassNameParserFactory;
+import tree.parserFactory.InvokeMethodNameParser;
+import tree.parserFactory.InvokeMethodNameParserFactory;
+import tree.parserFactory.MethodNameParserFactory;
+import tree.parserFactory.Parser;
+import tree.parserFactory.Provider;
+import tree.stanFactory.StanFactory;
+import tree.stanFactory.Staner;
 import tree.utils.ParserUtils;
 
 public class OneParser {
-	private File file;
-	private MySQLCor mysql;
+	public File file;
+	public MySQLCor mysql;
 	int count;
-	private List<File> filelist;
+	public List<File> filelist;
 
 	String[] javapack;
 	String[] androidpack;
@@ -52,6 +56,24 @@ public class OneParser {
 	/*Secondly we create the parser by using factory*/
 	Parser invokeMethodNameParser = invokeMethodNameParserFactory.produce();
 	Parser invokeClassNameParser = invokeClassNameParserFactory.produce();
+	
+	/*
+	 * Factories realization
+	 * Edit by liuyunhao
+	 * 2016/3/28
+	 */
+	/*Create factories of parsers*/
+	Provider methodNameParserFactory = new MethodNameParserFactory();
+	Provider classNameParserFactory = new ClassNameParserFactory();
+	StanFactory stanFactory = new StanFactory();//This is static factory pattern
+	/*Create the parser by using factory*/
+	Parser methodNameParser = methodNameParserFactory.produce();
+	Parser classNameParser = classNameParserFactory.produce();
+	//These are static factory pattern
+	Staner appVersionAndNameStaner = stanFactory.produceAppVersionAndNameStaner();
+	Staner classNameStaner = stanFactory.produceClassNameStaner();
+	Staner classSigStaner = stanFactory.produceClassSigStaner();
+	Staner packageNameStaner = stanFactory.producePackageNameStaner();
 
 	public OneParser() {
 	}
@@ -94,7 +116,7 @@ public class OneParser {
 		 //获得 apk 名字， 输入方法名， 输出方法名
 		ownpack = listOwnPackages();
 		apk = new StringBuffer(file.getName());
-		String []apkNameAndVersion = stanAppVersionAndName(apk);
+		String []apkNameAndVersion = (String[]) appVersionAndNameStaner.stan(apk);
 		
 		if(apkNameAndVersion != null){
 			apkInfo.setApkName(apkNameAndVersion[0]);
@@ -139,9 +161,9 @@ public class OneParser {
 					line.trimToSize();
 
 					if (line.toString().startsWith(".class")) {
-						StringBuffer sclassname = parseClassName(line);
-						classsig = stanClassSig(sclassname);
-						packagename = stanPackageName(classsig);
+						StringBuffer sclassname = (StringBuffer) classNameParser.parse(line);
+						classsig = (StringBuffer) classSigStaner.stan(sclassname);
+						packagename = (StringBuffer) packageNameStaner.stan(classsig);
 
 						continue;
 					}
@@ -150,7 +172,7 @@ public class OneParser {
 						//TODO 
 						Caller callerTmp = new Caller();
 						
-						StringBuffer smethodname = parseMethodName(line);
+						StringBuffer smethodname = (StringBuffer) methodNameParser.parse(line);
 						StringBuffer mname = new StringBuffer(smethodname
 								.substring(0, smethodname.indexOf("(")));
 
@@ -204,16 +226,16 @@ public class OneParser {
 							StringBuffer invokemethodsig = new StringBuffer();
 
 							if (line.toString().startsWith("invoke")) {
-								StringBuffer invokeclassname = invokeClassNameParser.parse(line);
-								StringBuffer invokemethodname = invokeMethodNameParser.parse(line);
+								StringBuffer invokeclassname = (StringBuffer) invokeClassNameParser.parse(line);
+								StringBuffer invokemethodname = (StringBuffer) invokeMethodNameParser.parse(line);
 
 								line = null;
 
-								StringBuffer inclasssig = stanClassSig(invokeclassname);
-								StringBuffer inpackagename = stanPackageName(inclasssig); // 这里对
+								StringBuffer inclasssig = (StringBuffer) classSigStaner.stan(invokeclassname);
+								StringBuffer inpackagename = (StringBuffer) packageNameStaner.stan(inclasssig);// 这里对
 																							// inpackagename
 																							// 进行判断
-								StringBuffer inclassname = stanClassName(inclasssig);
+								StringBuffer inclassname = (StringBuffer) classNameStaner.stan(inclasssig);
 
 								invokeclassname = null;
 
@@ -420,15 +442,15 @@ public class OneParser {
 					line.trimToSize();
 
 					if (line.toString().startsWith(".class")) {
-						StringBuffer sclassname = parseClassName(line);
-						classsig = stanClassSig(sclassname);
-						packagename = stanPackageName(classsig);
+						StringBuffer sclassname = (StringBuffer) classNameParser.parse(line);
+						classsig = (StringBuffer) classSigStaner.stan(sclassname);
+						packagename = (StringBuffer) packageNameStaner.stan(classsig);
 
 						continue;
 					}
 
 					if (line.toString().startsWith(".method")) {
-						StringBuffer smethodname = parseMethodName(line);
+						StringBuffer smethodname = (StringBuffer) methodNameParser.parse(line);
 						StringBuffer mname = new StringBuffer(smethodname
 								.substring(0, smethodname.indexOf("(")));
 
@@ -500,16 +522,16 @@ public class OneParser {
 							StringBuffer invokemethodsig = new StringBuffer();
 
 							if (line.toString().startsWith("invoke")) {
-								StringBuffer invokeclassname = invokeClassNameParser.parse(line);
-								StringBuffer invokemethodname = invokeMethodNameParser.parse(line);
+								StringBuffer invokeclassname = (StringBuffer) invokeClassNameParser.parse(line);
+								StringBuffer invokemethodname = (StringBuffer) invokeMethodNameParser.parse(line);
 
 								line = null;
 
-								StringBuffer inclasssig = stanClassSig(invokeclassname);
-								StringBuffer inpackagename = stanPackageName(inclasssig); // 这里对
+								StringBuffer inclasssig = (StringBuffer) classSigStaner.stan(invokeclassname);
+								StringBuffer inpackagename = (StringBuffer) packageNameStaner.stan(inclasssig);// 这里对
 																							// inpackagename
 																							// 进行判断
-								StringBuffer inclassname = stanClassName(inclasssig);
+								StringBuffer inclassname = (StringBuffer) classNameStaner.stan(inclasssig);
 
 								invokeclassname = null;
 
@@ -977,7 +999,7 @@ public class OneParser {
 		return 1;
 	}
 
-	private int selectId(String selectpid, StringBuffer args) {
+	public int selectId(String selectpid, StringBuffer args) {
 		int pid = 0;
 		ResultSet p = mysql.select(selectpid, args.toString());
 		try {
@@ -990,7 +1012,7 @@ public class OneParser {
 		return pid;
 	}
 
-	private int selectMax(String selectp) {
+	public int selectMax(String selectp) {
 		int pid = 0;
 		ResultSet p = mysql.select(selectp);
 		try {
@@ -1006,7 +1028,7 @@ public class OneParser {
 		return pid;
 	}
 
-	private boolean isJava(StringBuffer inpackagename) {
+	public boolean isJava(StringBuffer inpackagename) {
 		/*
 		 * for(int i = 0; i < javapack.length; i ++){
 		 * if((inpackagename.toString()).equals(javapack[i])){ return true; } }
@@ -1020,7 +1042,7 @@ public class OneParser {
 		return false;
 	}
 
-	private boolean isAndroid(StringBuffer inpackagename) {
+	public boolean isAndroid(StringBuffer inpackagename) {
 		/*
 		 * for(int i = 0; i < androidpack.length; i ++){
 		 * if((inpackagename.toString()).equals(androidpack[i])){ return true; }
@@ -1033,7 +1055,7 @@ public class OneParser {
 		return false;
 	}
 
-	private boolean isOwn(StringBuffer inpackagename, String[] ownpack) {
+	public boolean isOwn(StringBuffer inpackagename, String[] ownpack) {
 		for (int i = 0; i < ownpack.length; i++) {
 			if ((inpackagename.toString()).equals(ownpack[i])) {
 				return true;
@@ -1042,7 +1064,7 @@ public class OneParser {
 		return false;
 	}
 
-	private String[] listOwnPackages() {
+	public String[] listOwnPackages() {
 		StringBuffer packages[] = new StringBuffer[filelist.size()];
 
 		Iterator<File> packs = filelist.iterator();
@@ -1078,16 +1100,8 @@ public class OneParser {
 		return npackages;
 	}
 
-	private StringBuffer stanClassName(StringBuffer inclasssig) {
-		inclasssig = new StringBuffer(inclasssig.substring((inclasssig
-				.lastIndexOf(".") + 1)));
-		inclasssig.trimToSize();
-
-		return inclasssig;
-	}
-
 	
-	private Object parseArgs(StringBuffer args) {
+	public Object parseArgs(StringBuffer args) {
 		int index = 0;
 		StringBuffer stanargs = new StringBuffer();
 
@@ -1109,7 +1123,7 @@ public class OneParser {
 			else if (ParserUtils.isObjectLetter(letstr)) {
 				index = args.indexOf(";", i);
 				letter = new StringBuffer(args.substring(i, index));
-				letter = stanClassSig(letter);
+				letter = (StringBuffer) classSigStaner.stan(letter);
 
 				i = index;
 				if (i == (args.length() - 1)) {
@@ -1149,7 +1163,7 @@ public class OneParser {
 				else if (ParserUtils.isObjectLetter(letstr)) {
 					index = args.indexOf(";", i);
 					letter = new StringBuffer(args.substring(i, index));
-					letter = stanClassSig(letter);
+					letter = (StringBuffer) classSigStaner.stan(letter);
 					for (int j = 0; j < count; j++) {
 						letter = letter.append("[]");
 					}
@@ -1168,8 +1182,7 @@ public class OneParser {
 		return stanargs;
 	}
 
-
-	private String parseBaseType(String returntype) {
+	public String parseBaseType(String returntype) {
 		if ("V".equals(returntype))
 			return "void";
 		if ("Z".equals(returntype))
@@ -1192,7 +1205,7 @@ public class OneParser {
 		return returntype;
 	}
 
-	private StringBuffer parseRType(StringBuffer returntype) {
+	public StringBuffer parseRType(StringBuffer returntype) {
 		int count = 0;
 		if (ParserUtils.isBaseType(returntype)) {
 			returntype = new StringBuffer(parseBaseType(returntype.toString()));
@@ -1201,7 +1214,7 @@ public class OneParser {
 		}
 
 		else if (ParserUtils.isObject(returntype.toString())) {
-			returntype = stanClassSig(returntype);
+			returntype = (StringBuffer) classSigStaner.stan(returntype);
 			return returntype;
 
 		}
@@ -1221,7 +1234,7 @@ public class OneParser {
 			}
 
 			if (ParserUtils.isObject(returntype.toString())) {
-				returntype = stanClassSig(returntype);
+				returntype = (StringBuffer) classSigStaner.stan(returntype);
 				for (int i = 0; i < count; i++) {
 					returntype = returntype.append("[]");
 				}
@@ -1236,65 +1249,7 @@ public class OneParser {
 		return returntype;
 	}
 
-	private StringBuffer parseMethodName(StringBuffer line) {
-		StringBuffer methodname = new StringBuffer(line.substring(8));
-		methodname.trimToSize();
-		if (methodname.toString().contains(" ")) {
-			int index = methodname.lastIndexOf(" ");
-			methodname = new StringBuffer(methodname.substring(index + 1));
-
-		}
-		if (methodname.toString().endsWith(";")) {
-			methodname = new StringBuffer(methodname.substring(0, ((methodname
-					.length()) - 1)));
-
-		}
-
-		return methodname;
-	}
-
-	private StringBuffer stanPackageName(StringBuffer classsig) {
-		if (classsig.lastIndexOf(".") < 0) {
-			return classsig;
-		}
-
-		classsig = new StringBuffer(classsig.substring(0, classsig
-				.lastIndexOf(".")));
-		classsig.trimToSize();
-		return classsig;
-	}
-
-	private StringBuffer stanClassSig(StringBuffer sclassname) {
-		String str = sclassname.substring(1);
-		sclassname = new StringBuffer(str.replace("/", "."));
-		sclassname.trimToSize();
-
-		return sclassname;
-	}
-
-    private String[] stanAppVersionAndName(StringBuffer appName){
-    	//TODO 解析出version.
-    	String str_version = appName.toString() ;
-		String[] goal = str_version.split("-");
-		if(goal != null && goal.length ==2){
-			return goal;
-		}else{
-			return null;
-		}
-    }	
-	private StringBuffer parseClassName(StringBuffer line) {
-		StringBuffer classname = new StringBuffer((line.substring(7, (line
-				.length()) - 1)));
-		classname.trimToSize();
-		if (classname.toString().contains(" ")) {
-			int index = classname.lastIndexOf(" ");
-			classname = new StringBuffer(classname.substring(index + 1));
-		}
-
-		return classname;
-	}
-
-	private int listFiles() {
+	public int listFiles() {
 		ExtractOuterClass outcla = new ExtractOuterClass(file);
 		filelist = outcla.extractClassFile();
 
@@ -1314,7 +1269,7 @@ public class OneParser {
  * @param returnType
  * @param parameter
  */
-    private void  setCallBase(CallBase callBase,StringBuffer packageName,StringBuffer className,StringBuffer methodName,
+    public void  setCallBase(CallBase callBase,StringBuffer packageName,StringBuffer className,StringBuffer methodName,
     		StringBuffer methodType,StringBuffer returnType,StringBuffer parameter){
     	callBase.setPackageName(packageName.toString());
 		callBase.setClassName(className.toString());
@@ -1329,7 +1284,7 @@ public class OneParser {
      * @param apkInfo
      * @param sql
      */
-    private void sendDataToDB(ApkEntity apkInfo,MySQLCor sql){
+    public void sendDataToDB(ApkEntity apkInfo,MySQLCor sql){
     	
     	
     }

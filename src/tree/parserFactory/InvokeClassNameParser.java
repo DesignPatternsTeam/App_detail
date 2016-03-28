@@ -1,4 +1,4 @@
-package tree.factory;
+package tree.parserFactory;
 
 public class InvokeClassNameParser implements Parser {
 
