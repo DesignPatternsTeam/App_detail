@@ -1,4 +1,6 @@
-package tree.parse.parserFactory;
+package tree.parse.parserFactory.parsers;
+
+import tree.parse.parserFactory.Parser;
 
 public class InvokeMethodNameParser implements Parser {
 

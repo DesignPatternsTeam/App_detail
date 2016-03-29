@@ -25,13 +25,13 @@ import tree.parse.entity.ApkEntity;
 import tree.parse.entity.CallBase;
 import tree.parse.entity.Callee;
 import tree.parse.entity.Caller;
-import tree.parse.parserFactory.ClassNameParserFactory;
-import tree.parse.parserFactory.InvokeClassNameParserFactory;
-import tree.parse.parserFactory.InvokeMethodNameParser;
-import tree.parse.parserFactory.InvokeMethodNameParserFactory;
-import tree.parse.parserFactory.MethodNameParserFactory;
 import tree.parse.parserFactory.Parser;
 import tree.parse.parserFactory.Provider;
+import tree.parse.parserFactory.factory.ClassNameParserFactory;
+import tree.parse.parserFactory.factory.InvokeClassNameParserFactory;
+import tree.parse.parserFactory.factory.InvokeMethodNameParserFactory;
+import tree.parse.parserFactory.factory.MethodNameParserFactory;
+import tree.parse.parserFactory.parsers.InvokeMethodNameParser;
 import tree.parse.stanFactory.StanFactory;
 import tree.parse.stanFactory.Staner;
 import tree.utils.ParserUtils;
@@ -65,15 +65,15 @@ public class OneParser {
 	/*Create factories of parsers*/
 	Provider methodNameParserFactory = new MethodNameParserFactory();
 	Provider classNameParserFactory = new ClassNameParserFactory();
-	StanFactory stanFactory = new StanFactory();//This is static factory pattern
+	//StanFactory stanFactory = new StanFactory();//This is static factory pattern
 	/*Create the parser by using factory*/
 	Parser methodNameParser = methodNameParserFactory.produce();
 	Parser classNameParser = classNameParserFactory.produce();
 	//These are static factory pattern
-	Staner appVersionAndNameStaner = stanFactory.produceAppVersionAndNameStaner();
-	Staner classNameStaner = stanFactory.produceClassNameStaner();
-	Staner classSigStaner = stanFactory.produceClassSigStaner();
-	Staner packageNameStaner = stanFactory.producePackageNameStaner();
+	Staner appVersionAndNameStaner = StanFactory.produceAppVersionAndNameStaner();
+	Staner classNameStaner = StanFactory.produceClassNameStaner();
+	Staner classSigStaner = StanFactory.produceClassSigStaner();
+	Staner packageNameStaner = StanFactory.producePackageNameStaner();
 
 	public OneParser() {
 	}
